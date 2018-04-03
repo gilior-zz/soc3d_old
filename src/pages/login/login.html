@@ -12,11 +12,13 @@
 
 <ion-content>
 
-<ion-toolbar>
-  <ion-title>
-    sign in to app
-  </ion-title>
-</ion-toolbar>
+  <ion-toolbar>
+    <ion-title>
+      sign in to app
+    </ion-title>
+  </ion-toolbar>
 
   <button ion-button color="secondary">sign in</button>
+  <p>register a free account to recieve rewards from the app</p>
+  <button ion-button color="danger" [navPush]="regPage">create an account</button>
 </ion-content>

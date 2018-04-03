@@ -1,5 +1,7 @@
 import {Component} from '@angular/core';
 import {NavController} from 'ionic-angular';
+import {AngularFireAuth} from "angularfire2/auth";
+import {UserServiceProvider} from "../../providers/user-service/user-service";
 
 @Component({
   selector: 'page-home',
@@ -14,9 +16,21 @@ export class HomePage {
   ]
 
   logPage: string;
+  loggedIn: any;
 
-  constructor(public navCtrl: NavController) {
-    this.logPage = "LoginPage"
+  constructor(public navCtrl: NavController,
+              private angularFireAuth: AngularFireAuth,
+              public userServiceProvider: UserServiceProvider) {
+    this.logPage = "LoginPage";
+    this.angularFireAuth.auth.onAuthStateChanged(user => {
+      if (user) {
+        this.loggedIn = user.email;
+      }
+    })
   }
 
+  signOff() {
+    this.userServiceProvider.logOut();
+    this.loggedIn = '';
+  }
 }
