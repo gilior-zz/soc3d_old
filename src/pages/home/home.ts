@@ -1,13 +1,16 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NavController} from 'ionic-angular';
 import {AngularFireAuth} from "angularfire2/auth";
 import {UserServiceProvider} from "../../providers/user-service/user-service";
+import {Page} from "ionic-angular/navigation/nav-util";
+
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
-export class HomePage {
+export class HomePage implements OnInit {
+
   menuData = [
     {title: 'Our menu', pic: 'assets/imgs/a.jpg', pushPage: 'MenuPage'},
     {title: 'Account', pic: 'assets/imgs/b.jpg', pushPage: 'AccountPage'},
@@ -21,16 +24,30 @@ export class HomePage {
   constructor(public navCtrl: NavController,
               private angularFireAuth: AngularFireAuth,
               public userServiceProvider: UserServiceProvider) {
-    this.logPage = "LoginPage";
-    this.angularFireAuth.auth.onAuthStateChanged(user => {
-      if (user) {
-        this.loggedIn = user.email;
-      }
-    })
+
   }
 
   signOff() {
     this.userServiceProvider.logOut();
     this.loggedIn = '';
+  }
+
+  myPagePush(page: Page) {
+    this.navCtrl.push(page)
+      .then(res => {
+        if (!res) {
+          this.userServiceProvider.displayAlerts('sorry', 'register 1st')
+        }
+      })
+
+  }
+
+  ngOnInit(): void {
+    this.logPage = "LoginPage";
+    this.angularFireAuth.auth.onAuthStateChanged(user => {
+      if (user) {
+        this.loggedIn = this.userServiceProvider.user = user.email;
+      }
+    })
   }
 }

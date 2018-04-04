@@ -4,6 +4,8 @@ import {AngularFireAuth} from "angularfire2/auth";
 import {AlertController} from "ionic-angular";
 import {AngularFireDatabase, FirebaseListObservable} from "angularfire2/database";
 import {Storage} from "@ionic/storage";
+import {UserData} from "../../models";
+import {RewardServiceProvider} from "../reward-service/reward-service";
 
 /*
   Generated class for the UserServiceProvider provider.
@@ -13,17 +15,19 @@ import {Storage} from "@ionic/storage";
 */
 @Injectable()
 export class UserServiceProvider {
-  items: FirebaseListObservable<any>
+  items: FirebaseListObservable<UserData[]>
   success: boolean;
+  user: string | null;
 
   constructor(private angularFireAuth: AngularFireAuth,
               public alertController: AlertController,
               private storage: Storage,
-              private angularFireDatabase: AngularFireDatabase) {
+              private angularFireDatabase: AngularFireDatabase,
+              private rewardServiceProvider: RewardServiceProvider) {
     this.items = this.angularFireDatabase.list('/users');
   }
 
-  displayAlerts(alertTitle, alertSub) {
+  displayAlerts(alertTitle: string, alertSub: any) {
     let l = this.alertController.create({
       title: alertTitle,
       subTitle: alertSub,
@@ -34,11 +38,14 @@ export class UserServiceProvider {
 
   logOut() {
     this.angularFireAuth.auth.signOut()
-      .then(res => this.displayAlerts('logged out', 'ba by'))
+      .then(res => {
+        this.displayAlerts('logged out', 'ba by');
+        this.success = false;
+      })
       .catch(err => this.displayAlerts('err!', err))
   }
 
-  storageControl(action, key?, value?) {
+  storageControl(action: 'get' | 'set' | 'delete', key?, value?) {
     if (action === 'set') return this.storage.set(key, value);
     if (action === 'get') return this.storage.get(key);
     if (!key) {
@@ -49,7 +56,7 @@ export class UserServiceProvider {
     return this.storage.remove(key);
   }
 
-  saveNewUserToStorage(user) {
+  saveNewUserToStorage(user: string) {
     let userObj = {
       creation: new Date().toDateString(),
       logins: 1,
@@ -72,10 +79,10 @@ export class UserServiceProvider {
     return this.storageControl('get', user);
   }
 
-  updateUser(user, userData) {
+  updateUser(user: string, userData: UserData) {
     let newData = {
       creation: userData.creation,
-      logins: userData.logins + 1,
+      logins: userData.logins,
       rewardsCount: userData.rewardsCount,
       lastLogin: new Date().toLocaleString(),
       id: userData.id
@@ -88,7 +95,7 @@ export class UserServiceProvider {
     return this.storageControl('set', user, newData)
   }
 
-  logon(user, pwd) {
+  logon(user: string, pwd: string) {
     return this.angularFireAuth.auth.signInWithEmailAndPassword(user, pwd)
       .then(res => {
         this.storageControl('get', user)
@@ -98,8 +105,12 @@ export class UserServiceProvider {
                 .then(res => this.displayAlerts(user, 'user saved'))
             }
             else {
-              this.updateUser(user, userFromStorage)
-                .then(updatedUser => this.displayAlerts(user, 'updated some data'))
+              this.rewardServiceProvider.rewardsCheck(user, userFromStorage)
+                .then((rewardsCheckResult: UserData) => {
+                  this.updateUser(user, rewardsCheckResult)
+                    .then(updatedUser => this.displayAlerts(user, 'updated some data'))
+                })
+
             }
             this.success = true;
           })
