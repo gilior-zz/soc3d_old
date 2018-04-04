@@ -6,13 +6,45 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>account</ion-title>
+  <ion-toolbar color="secondary">
+    <img src="assets/imgs/logo.png"/>
+  </ion-toolbar>
+  <ion-navbar color="secondary">
+    <ion-title>account info</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+  <ion-item>
+    <ion-avatar item-start>
+      <ion-icon name="contacts"></ion-icon>
+    </ion-avatar>
+    <h1>{{accountUser}}</h1>
+  </ion-item>
+  <ion-list>
+    <ion-item>
+      <ion-icon name="calendar" item-start></ion-icon>
+      registered:{{userInfo.creation}}
+    </ion-item>
+    <ion-item>
+      <ion-icon name="cash" item-start></ion-icon>
+      logged in:{{userInfo.logins}}
+    </ion-item>
+    <ion-item>
+      <ion-icon name="cafe" item-start></ion-icon>
+      earned:
+      <ion-badge color="secondary">{{userInfo.rewardsCount}}</ion-badge>
+    </ion-item>
+  </ion-list>
 
+  <ion-list>
+    <ion-list-header>
+      rewards:
+    </ion-list-header>
+    <ion-item *ngFor="let reward of rewardInfo" class="myRewards">
+      {{reward.amount|currency:'USD':true}} off ur order
+    </ion-item>
+  </ion-list>
 </ion-content>
