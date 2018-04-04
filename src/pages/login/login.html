@@ -6,7 +6,7 @@
 -->
 <ion-header>
   <ion-toolbar color="secondary">
-    <img src="../../assets/imgs/logo.png" height="159" width="318"/></ion-toolbar>
+    <img src="assets/imgs/logo.png" height="159" width="318"/></ion-toolbar>
 </ion-header>
 
 
@@ -18,7 +18,19 @@
     </ion-title>
   </ion-toolbar>
 
-  <button ion-button color="secondary">sign in</button>
+  <ion-item>
+    <ion-label color="danger">email address</ion-label>
+    <ion-input type="email" [(ngModel)]="login.email"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label color="danger">pwd</ion-label>
+    <ion-input type="text" [(ngModel)]="login.pwd"></ion-input>
+  </ion-item>
+
+  <button (click)="signIn()" ion-button color="secondary">sign in</button>
+
+
   <p>register a free account to recieve rewards from the app</p>
   <button ion-button color="danger" [navPush]="regPage">create an account</button>
 </ion-content>
